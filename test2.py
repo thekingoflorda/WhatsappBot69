@@ -1,1 +1,0 @@
-print("“blup”".replace("“", "\"").replace("”", "\""))	
