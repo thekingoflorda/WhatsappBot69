@@ -1,0 +1,1 @@
+print("“blup”".replace("“", "\"").replace("”", "\""))	
