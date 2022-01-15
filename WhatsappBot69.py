@@ -1,7 +1,6 @@
 def check_messages():
     global savedMessageDataList, messageDataList, Messages, messagesSend, commandsIssuedList
     getTexts()
-    #messageDataList = list(reversed(messageDataList))
     if savedMessageDataList == []:
         savedMessageDataList = messageDataList
     commandsIssuedList = []
@@ -381,45 +380,6 @@ def commandParser(message):
                                 responseFunction("Anti-simp modus activated.")
                         else:
                             responseFunction("You are not my creator.")
-                    elif parsedMessage.lower().startswith("!hc:"):
-                        if parsedName in data["hc"].keys():
-                            if parsedMessage.lower().replace("!hc:","") == "move":
-                                if data["hc"][parsedName]["health"] > 0:
-                                    data["hc"][parsedName]["level"] += 1
-                                    if data["hc"][parsedName]["level"] == 5:
-                                        responseFunction("You open a big dark door and walk trough it. You are afraid to enter the room after your last fights, but you need to move on.")
-                                        responseFunction("It's silent.")
-                                        responseFunction("Suddenly a huge monster jumps from the darkness and attacks you.")
-                                        newEnemy(parsedName, 3, 5, 0, parsedName)
-                                else:
-                                    responseFunction("You have no lifes left, use !hc:respawn to start again.")
-                            elif parsedMessage.lower().replace("!hc:","") == "respawn":
-                                data["hc"][parsedName]["health"] = 10
-                                data["hc"][parsedName]["mana"] = 10
-                                data["hc"][parsedName]["level"] = 1
-                                data["hc"][parsedName]["currentEnemyHealth"] = 0
-                                responseFunction("You have respawned.")
-                            elif parsedMessage.lower().replace("!hc:","") == "attack:sword":
-                                if data["hc"][parsedName]["mana"] > data["hc"][parsedName]["sword"]["mana"]:
-                                    if data["hc"][parsedName]["currentEnemyHealth"] > 0:
-                                        data["hc"][parsedName]["currentEnemyHealth"] -= data["hc"][parsedName]["sword"]["damage"]
-                                        data["hc"][parsedName]["mana"] -= data["hc"][parsedName]["sword"]["mana"]
-                                        responseFunction("You attack the monster with your sword. It has {} health left.".format(data["hc"][parsedName]["currentEnemyHealth"]))
-                                        if data["hc"][parsedName]["currentEnemyHealth"] <= 0:
-                                            responseFunction("You killed the monster.")
-                                            data["hc"][parsedName]["mana"] += data["hc"][parsedName]["manaRegen"]
-                                            data["hc"][parsedName]["health"] += data["hc"][parsedName]["healthRegen"]
-                                            responseFunction("You now have {} health and {} mana.".format(data["hc"][parsedName]["health"], data["hc"][parsedName]["mana"]))
-                                        else:
-                                            responseFunction("The monster attacks you back.")
-                                            data["hc"][parsedName]["health"] -= data["hc"][parsedName]["currentEnemyDamage"]
-                                            if data["hc"][parsedName]["health"] <= 0:
-                                                responseFunction("You died.")
-                                                data["hc"][parsedName]["health"] = 0
-                                            else:
-                                                responseFunction("You now have {} health.".format(data["hc"][parsedName]["health"]))
-                        else:
-                            responseFunction("You are not yet implemented into the hc system, contact my creator.")
                     elif parsedMessage.lower().startswith("!praise:"):
                         responseFunction(parsedMessage.replace("!praise:", "") + ": " + random.choice(["I have never seen someone wear their " + random.choice(["pants", "glasses", "underwear", "shoes", "socks", "appie socks", "shirt", "hoodie"]) + " as good as you do.",
                         "Thanks for being in my " + random.choice(["facebook group.", "general location.", "friend-zoned list.", "gay club."]),
@@ -508,14 +468,6 @@ def commandParser(message):
     except UnboundLocalError:
         pass
 
-def newEnemy(health, attack, randomness, username):
-    health = health + random.randint(-randomness, randomness)
-    attack = attack + random.randint(-randomness, randomness)
-    responseFunction("A new enemy has appeared! He has the following stats: health: {} attack: {}".format(health, attack))
-    responseFunction("Attack him with !hc:attack:Sword (at: {}, man: {}) or !hc:attack:Bow (at: {}, man: {})".format(data["hc"][username]["sword"]["attack"], data["hc"][username]["bow"]["mana"], data["hc"][username]["sword"]["attack"], data["hc"][username]["bow"]["mana"]))
-    data["hc"][username]["currentEnemyHealth"] = health
-    data["hc"][username]["currentEnemyAttack"] = attack
-
 def responseFunction(message):
     global messagesSend
     print("Responded with: " + message)
@@ -572,7 +524,7 @@ from selenium.webdriver.common.keys import Keys
 from translate import Translator
 import time, datetime, pyautogui, random, jokes, json
 
-global refreshes, counter, lastRenameTime, botName, countGameCounter, countGameRecord, pollList, savedTimeStamps, startingTime, commandsIssued, messagesScanned, messagesSend, refreshes, countGameName, antiSimpModus, emojiLimit
+global refreshes, counter, lastRenameTime, botName, countGameCounter, countGameRecord, pollList, savedTimeStamps, startingTime, commandsIssued, messagesScanned, messagesSend, countGameName, antiSimpModus, emojiLimit
 savedMessageDataList = []
 messagesSend = []
 
