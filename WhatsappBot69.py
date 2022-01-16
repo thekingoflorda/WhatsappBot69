@@ -276,7 +276,7 @@ def commandParser(message):
                         else:
                             responseFunction("{} does not exist".format(parsedMessage.split(":")[1].replace("@", "")))
                     elif parsedMessage.lower().startswith("!investlist"):
-                        investmentListString = ""
+                        investmentListString = parsedName + "'s investments: "
                         for enu, investment in enumerate(data["personalData"][parsedName]["investments"]):
                             investmentListString += str(enu) + ": " + str(investment[1] * (data["personalData"][investment[2]]["money"] / investment[0])) + " in " + investment[2] + " || "
                         responseFunction(investmentListString)
