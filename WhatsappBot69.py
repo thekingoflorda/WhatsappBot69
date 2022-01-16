@@ -313,6 +313,41 @@ def commandParser(message):
                             data["personalData"][parsedName]["money"] += randomClaimAmount
                             data["personalData"][parsedName]["claimTime"] = time.time()
                             responseFunction("{} claimed {} money, you can claim again in 24 hours.".format(parsedName, randomClaimAmount))
+                    elif parsedMessage.lower().startswith("!sendmoney:"):
+                        if parsedMessage.split(":")[1].replace("@", "") in data["personalData"].keys():
+                            if float(parsedMessage.split(":")[2]) < data["personalData"][parsedName]["money"]:
+                                data["personalData"][parsedName]["money"] -= float(parsedMessage.split(":")[2])
+                                data["personalData"][parsedMessage.split(":")[1].replace("@", "")]["money"] += float(parsedMessage.split(":")[2])
+                                responseFunction("{} sent {} money to {}".format(parsedName, parsedMessage.split(":")[2], parsedMessage.split(":")[1].replace("@", "")))
+                            else:
+                                responseFunction("{} does not have enough money to send that much".format(parsedName))
+                        else:
+                            responseFunction("{} does not exist".format(parsedMessage.split(":")[1].replace("@", "")))
+                    elif parsedMessage.lower().startswith("!gamble:"):
+                        if float(parsedMessage.split(":")[1]) < data["personalData"][parsedName]["money"]:
+                            data["personalData"][parsedName]["gambleAmount"] = float(parsedMessage.split(":")[1])
+                            responseFunction("Gamble challange created, type !acceptgamble:{} to accept".format(parsedName))
+                        else:
+                            responseFunction("{} does not have enough money to gamble that much".format(parsedName))
+                    elif parsedMessage.lower().startswith("!acceptgamble:"):
+                        if parsedMessage.split(":")[1] in data["personalData"].keys():
+                            if "gambleAmount" in data["personalData"][parsedMessage.split(":")[1]].keys() and data["personalData"][parsedMessage.split(":")[1]]["gambleAmount"] > 0:
+                                if data["personalData"][parsedMessage.split(":")[1]]["gambleAmount"] < data["personalData"][parsedName]["money"]:
+                                    if random.randint(1, 2) == 1:
+                                        data["personalData"][parsedName]["money"] += data["personalData"][parsedMessage.split(":")[1]]["gambleAmount"]
+                                        data["personalData"][parsedMessage.split(":")[1]]["money"] -= data["personalData"][parsedMessage.split(":")[1]]["gambleAmount"]
+                                        responseFunction("{} won {} money".format(parsedName, data["personalData"][parsedMessage.split(":")[1]]["gambleAmount"]))
+                                    else:
+                                        data["personalData"][parsedName]["money"] -= data["personalData"][parsedMessage.split(":")[1]]["gambleAmount"]
+                                        data["personalData"][parsedMessage.split(":")[1]]["money"] += data["personalData"][parsedMessage.split(":")[1]]["gambleAmount"]
+                                        responseFunction("{} lost {} money".format(parsedName, data["personalData"][parsedMessage.split(":")[1]]["gambleAmount"]))
+                                    data["personalData"][parsedMessage.split(":")[1]]["gambleAmount"] = 0
+                                else:
+                                    responseFunction("{} does not have enough money to accept the gamble".format(parsedName))
+                            else:
+                                responseFunction("{} has no gamble to accept".format(parsedMessage.split(":")[1]))
+                        else:
+                            responseFunction("{} does not exist".format(parsedMessage.split(":")[1]))
                     elif "!emojilimit:" in parsedMessage.lower():
                         if parsedName in admins:
                             try:
