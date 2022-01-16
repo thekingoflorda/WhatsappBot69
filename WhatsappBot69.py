@@ -1,3 +1,6 @@
+from ast import parse
+
+
 def check_messages():
     global savedMessageDataList, messageDataList, Messages, messagesSend, commandsIssuedList
     getTexts()
@@ -65,29 +68,28 @@ def commandParser(message):
 
     try:
         if not parsedMessage.startswith(botName + " says:"):  
-            if parsedName in data["achievements"].keys():
-                data["achievements"][parsedName]["messagesSend"] += 1
-                if data["achievements"][parsedName]["messagesSend"] == 100:
+            if parsedName in data["personalData"].keys():
+                data["personalData"][parsedName]["messagesSend"] += 1
+                if data["personalData"][parsedName]["messagesSend"] == 100:
                     responseFunction("{} has unlocked the achievement: Whatsapp adict 1!".format(parsedName))
-                elif data["achievements"][parsedName]["messagesSend"] == 200:
+                elif data["personalData"][parsedName]["messagesSend"] == 200:
                     responseFunction("{} has unlocked the achievement: Whatsapp adict 2!".format(parsedName))
-                elif data["achievements"][parsedName]["messagesSend"] == 500:
+                elif data["personalData"][parsedName]["messagesSend"] == 500:
                     responseFunction("{} has unlocked the achievement: Whatsapp adict 3!".format(parsedName))
-                elif data["achievements"][parsedName]["messagesSend"] == 1000:
+                elif data["personalData"][parsedName]["messagesSend"] == 1000:
                     responseFunction("{} has unlocked the achievement: Whatsapp adict 4!".format(parsedName))
-                elif data["achievements"][parsedName]["messagesSend"] == 2000:
+                elif data["personalData"][parsedName]["messagesSend"] == 2000:
                     responseFunction("{} has unlocked the achievement: Whatsapp adict 5!".format(parsedName))
-                elif data["achievements"][parsedName]["messagesSend"] == 5000:
+                elif data["personalData"][parsedName]["messagesSend"] == 5000:
                     responseFunction("{} has unlocked the achievement: Whatsapp adict 6!".format(parsedName))
-                elif data["achievements"][parsedName]["messagesSend"] == 10000:
+                elif data["personalData"][parsedName]["messagesSend"] == 10000:
                     responseFunction("{} has unlocked the achievement: Whatsapp adict 7!".format(parsedName))
 
+            for item in notifyList:
+                if parsedName == item[0]:
+                    responseFunction(item[2] + " wanted to notify " + item[0] + " of: " + item[1])
+                    del notifyList[notifyList.index(item)]
             try:
-                for item in notifyList:
-                    if parsedName == item[0]:
-                        responseFunction(item[2] + " wanted to notify " + item[0] + " of: " + item[1])
-                        del notifyList[notifyList.index(item)]
-
                 if parsedName in antiSimpPersons and antiSimpModus:
                     if random.randint(0, 10) == 10:
                         responseFunction(random.choice(["Moet jij niet in de keuken staan ofzo?", "Oh god, een meisje...", "Ja ik ben sexistisch, dus?", "Het leven is hard, vooral als er een meisje in de whatsapp groep zit...", "Anti-simp modus is actief, dus praat ik opeens nederlands.", "Ik vindt dat de nieuwe James Bond een vrouw moet zijn, stel je voor hoe goed de explosies en de auto-crashes zullen zijn. En dat terwijl ze aan het parkeren is.", "Sexisme in de banenmarkt bestaat niet. Vrouwen kiezen simpelweg slechtbetalende banen, mannen worden dokter, rechter of professor. Vrouwen worden vrouwlijke dokter, vrouwlijke rechter of vrouwlijke proffesor.", ""]))
@@ -104,15 +106,15 @@ def commandParser(message):
                                 for i in range(int(parsedMessage.split(":")[0].replace("!Spam", "").replace("!spam", ""))):
                                     if i < 10:
                                         responseFunction(parsedMessage.split(":")[1].replace("\n", " | "))
-                                if parsedName in data["achievements"].keys():
-                                    data["achievements"][parsedName]["spamCommandUsed"] += 1
-                                    if data["achievements"][parsedName]["spamCommandUsed"] == 10:
+                                if parsedName in data["personalData"].keys():
+                                    data["personalData"][parsedName]["spamCommandUsed"] += 1
+                                    if data["personalData"][parsedName]["spamCommandUsed"] == 10:
                                         responseFunction("{} has unlocked the achievement: SPAMMER 1!".format(parsedName))
-                                    elif data["achievements"][parsedName]["spamCommandUsed"] == 20:
+                                    elif data["personalData"][parsedName]["spamCommandUsed"] == 20:
                                         responseFunction("{} has unlocked the achievement: SPAMMER 2!".format(parsedName))
-                                    elif data["achievements"][parsedName]["spamCommandUsed"] == 50:
+                                    elif data["personalData"][parsedName]["spamCommandUsed"] == 50:
                                         responseFunction("{} has unlocked the achievement: SPAMMER 3!".format(parsedName))
-                                    elif data["achievements"][parsedName]["spamCommandUsed"] == 100:
+                                    elif data["personalData"][parsedName]["spamCommandUsed"] == 100:
                                         responseFunction("{} has unlocked the achievement: SPAMMER 4!".format(parsedName))
                             except Exception as error:
                                 print("Error: ", error)
@@ -228,15 +230,15 @@ def commandParser(message):
                                 elif counter > 20:
                                     responseFunction("The joke API has run out of funny juice. Please try again later.")
                                     break
-                            if parsedName in data["achievements"].keys():
-                                data["achievements"][parsedName]["jokes"] += 1
-                                if data["achievements"][parsedName]["jokes"] == 10:
+                            if parsedName in data["personalData"].keys():
+                                data["personalData"][parsedName]["jokes"] += 1
+                                if data["personalData"][parsedName]["jokes"] == 10:
                                         responseFunction("{} has unlocked the achievement: JOKER 1!".format(parsedName))
-                                elif data["achievements"][parsedName]["jokes"] == 20:
+                                elif data["personalData"][parsedName]["jokes"] == 20:
                                     responseFunction("{} has unlocked the achievement: JOKER 2!".format(parsedName))
-                                elif data["achievements"][parsedName]["jokes"] == 50:
+                                elif data["personalData"][parsedName]["jokes"] == 50:
                                     responseFunction("{} has unlocked the achievement: JOKER 3!".format(parsedName))
-                                elif data["achievements"][parsedName]["jokes"] == 100:
+                                elif data["personalData"][parsedName]["jokes"] == 100:
                                     responseFunction("{} has unlocked the achievement: JOKER 4!".format(parsedName))
                         else:
                             responseFunction("STFU, your muted...")
@@ -248,10 +250,69 @@ def commandParser(message):
                             responseFunction("STFU, your muted...")
                     elif parsedMessage.lower().startswith("!adore:"):
                         responseFunction(parsedMessage.replace("!adore:", "") + ": " + random.choice(data["savedVars"]["adoreList"]))
-                    elif parsedMessage.lower().startswith("!deutsch:"):
-                        translator= Translator(to_lang="de")
-                        translation = translator.translate(parsedMessage.split(":")[1])
-                        responseFunction(translation)
+                    elif parsedMessage.lower().startswith("!moneylist"):
+                        moneyListString = ""
+                        for player in data["personalData"].keys():
+                            if "money" not in data["personalData"][player].keys():
+                                data["personalData"][player]["money"] = 100
+                                data["personalData"][player]["cloverUpgrade"] = 0
+                            moneyListString += (player + ": " + str(data["personalData"][player]["money"]) + " || ")
+                        if "bankMoney" in data["savedVars"].keys():
+                            moneyListString += ("Bank: " + str(data["savedVars"]["bankMoney"]))
+                        else:
+                            data["savedVars"]["bankMoney"] = 0
+                        responseFunction(moneyListString)
+                    elif parsedMessage.lower().startswith("!invest:"):
+                        if parsedMessage.split(":")[1].replace("@", "") in data["personalData"].keys():
+                            if "investments" not in data["personalData"][parsedName].keys():
+                                data["personalData"][parsedName]["investments"] = []
+                            if int(parsedMessage.split(":")[2]) < data["personalData"][parsedName]["money"] and int(parsedMessage.split(":")[2]) > 0:
+                                data["personalData"][parsedName]["money"] -= int(parsedMessage.split(":")[2])
+                                data["personalData"][parsedMessage.split(":")[1].replace("@", "")]["money"] += int(parsedMessage.split(":")[2])
+                                data["personalData"][parsedName]["investments"].append([data["personalData"][parsedMessage.split(":")[1].replace("@", "")]["money"], int(parsedMessage.split(":")[2]), parsedMessage.split(":")[1].replace("@", "")])
+                                responseFunction("{} invested {} in {}".format(parsedName, parsedMessage.split(":")[2], parsedMessage.split(":")[1].replace("@", "")))
+                            else:
+                                responseFunction("{} does not have enough money to invest that much or you are trying to invest less than 1 money.".format(parsedName))
+                        else:
+                            responseFunction("{} does not exist".format(parsedMessage.split(":")[1].replace("@", "")))
+                    elif parsedMessage.lower().startswith("!investlist"):
+                        investmentListString = ""
+                        for enu, investment in enumerate(data["personalData"][parsedName]["investments"]):
+                            investmentListString += str(enu) + ": " + str(investment[1] * (data["personalData"][investment[2]]["money"] / investment[0])) + " in " + investment[2] + " || "
+                        responseFunction(investmentListString)
+                    elif parsedMessage.lower().startswith("!sell:"):
+                        if len(data["personalData"][parsedName]["investments"]) > int(parsedMessage.split(":")[1]):
+                            data["personalData"][parsedName]["money"] += data["personalData"][parsedName]["investments"][int(parsedMessage.split(":")[1])][1] * (data["personalData"][data["personalData"][parsedName]["investments"][int(parsedMessage.split(":")[1])][2]]["money"] / data["personalData"][parsedName]["investments"][int(parsedMessage.split(":")[1])][0])
+                            data["personalData"][data["personalData"][parsedName]["investments"][int(parsedMessage.split(":")[1])][2]]["money"] -= data["personalData"][parsedName]["investments"][int(parsedMessage.split(":")[1])][1] * (data["personalData"][data["personalData"][parsedName]["investments"][int(parsedMessage.split(":")[1])][2]]["money"] / data["personalData"][parsedName]["investments"][int(parsedMessage.split(":")[1])][0])
+                            data["personalData"][parsedName]["investments"].pop(int(parsedMessage.split(":")[1]))
+                            responseFunction("{} sold their investment {}".format(parsedName, parsedMessage.split(":")[1]))
+                    elif parsedMessage.lower().startswith("!money"):
+                        responseFunction(parsedName + " has " + str(data["personalData"][parsedName]["money"]) + " money")
+                    elif parsedMessage.lower() == "!upgradeclover":
+                        if "cloverUpgrade" in data["personalData"][parsedName].keys():
+                            if cloverUpgradeList[data["personalData"][parsedName]["cloverUpgrade"]][0] < data["personalData"][parsedName]["money"]:
+                                data["personalData"][parsedName]["money"] -= cloverUpgradeList[data["personalData"][parsedName]["cloverUpgrade"]][0]
+                                data["personalData"][parsedName]["cloverUpgrade"] += 1
+                                responseFunction("Upgraded " + parsedName + " to " + cloverUpgradeList[data["personalData"][parsedName]["cloverUpgrade"]][2] + "!")
+                            else:
+                                responseFunction("You don't have enough money to upgrade " + parsedName)
+                        else:
+                            responseFunction("Error: message my master.")
+                    elif parsedMessage.lower() == "!claim":
+                        if "claimTime" in data["personalData"][parsedName].keys():
+                            if data["personalData"][parsedName]["claimTime"] + 86400 < time.time():
+                                randomClaimAmount = random.randint(1, 100 / data["personalData"][parsedName]["cloverUpgrade"])
+                                data["personalData"][parsedName]["money"] += randomClaimAmount
+                                data["personalData"][parsedName]["claimTime"] = time.time()
+                                responseFunction("{} claimed {} money, you can claim again in 24 hours.".format(parsedName, randomClaimAmount))
+                            else:
+                                responseFunction("You can claim again in {} seconds.".format(str(data["personalData"][parsedName]["claimTime"] + 86400 - time.time())))
+                        else:
+                            data["personalData"][parsedName]["claimTime"] = time.time()
+                            randomClaimAmount = random.randint(1, int(100 / cloverUpgradeList[data["personalData"][parsedName]["cloverUpgrade"]][1]))
+                            data["personalData"][parsedName]["money"] += randomClaimAmount
+                            data["personalData"][parsedName]["claimTime"] = time.time()
+                            responseFunction("{} claimed {} money, you can claim again in 24 hours.".format(parsedName, randomClaimAmount))
                     elif "!emojilimit:" in parsedMessage.lower():
                         if parsedName in admins:
                             try:
@@ -304,8 +365,8 @@ def commandParser(message):
                     elif parsedMessage.lower() == "!save":
                         saveFile()
                     elif parsedMessage.lower() == "!achievements":
-                        if parsedName in data["achievements"].keys():
-                            responseFunction("MessageSend(100, 200, 500, 1000, 2000, 5000, 10000): {} || Thomas emoji(10, 20, 50, 100): {} || \"ik ben gay\"(10, 20, 50, 100): {} || praiser(10, 20, 50, 100): {} || praised(10, 20, 50, 100): {} || spammer(10, 20, 50, 100): {} || joker(10, 20, 50, 100): {}".format(data["achievements"][parsedName]["messagesSend"], data["achievements"][parsedName]["thomasEmoji"], data["achievements"][parsedName]["gayUsage"], data["achievements"][parsedName]["praiseSend"], data["achievements"][parsedName]["praiseReceived"], data["achievements"][parsedName]["spamCommandUsed"], data["achievements"][parsedName]["jokes"]))
+                        if parsedName in data["personalData"].keys():
+                            responseFunction("MessageSend(100, 200, 500, 1000, 2000, 5000, 10000): {} || Thomas emoji(10, 20, 50, 100): {} || \"ik ben gay\"(10, 20, 50, 100): {} || praiser(10, 20, 50, 100): {} || praised(10, 20, 50, 100): {} || spammer(10, 20, 50, 100): {} || joker(10, 20, 50, 100): {}".format(data["personalData"][parsedName]["messagesSend"], data["personalData"][parsedName]["thomasEmoji"], data["personalData"][parsedName]["gayUsage"], data["personalData"][parsedName]["praiseSend"], data["personalData"][parsedName]["praiseReceived"], data["personalData"][parsedName]["spamCommandUsed"], data["personalData"][parsedName]["jokes"]))
                         else:
                             responseFunction("You are not yet implemented into the achievement system, contact my creator.")
                     elif parsedMessage.lower().startswith("!rename:"):
@@ -346,30 +407,12 @@ def commandParser(message):
                         if parsedMessage.split(":")[1].replace("@", "") in ["Luc van Remmerden", "Daan", "Casper", "Jasper", "Emanuel", "Niels", "Crystal", "Lars", "Philippe", "Sem", "Thomas", "Zenno"]:
                             notifyList.append([parsedMessage.split(":")[1].replace("@", ""), parsedMessage.split(":")[2].replace("\n", " | "), parsedName])
                             responseFunction("I am going to notify " + parsedMessage.split(":")[1].replace("@", "") + " of " + parsedMessage.split(":")[2].replace("\n", " | "))
-                    elif parsedMessage.lower().startswith("!addicts:"):
-                        tempList = []
-                        for person in data["achievements"].keys():
-                            tempList.append(data["achievements"][person]["messagesSend"])
+                    elif parsedMessage.lower() == "!addicts":
+                        addictListString = ""
+                        for person in data["personalData"].keys():
+                            addictListString += person + ": " + str(data["personalData"][person]["messagesSend"]) + " || "
+                        responseFunction(addictListString)
 
-                        #Get the three persons who send the most messages
-                        addictString = ""
-
-                        people = int(parsedMessage.split(":")[1])
-
-                        if parsedName in muted and people > 3:
-                            responseFunction("You are muted, you have a limit of 3 (:)")
-                            people = 3
-
-                        if people <= len(tempList):
-                            for i in range(people):
-                                maxValue = max(tempList)
-                                index = tempList.index(maxValue)
-                                tempList[index] = 0
-                                addictString += list(data["achievements"].keys())[index] + ": " + str(maxValue) + " messages\n"
-                                tempList[index] = -99
-                            responseFunction(addictString)
-                        else:
-                            responseFunction("Error: there are only " + str(len(tempList)) + " people in the list!")
                     elif parsedMessage.lower().startswith("!anti-simp"):
                         if parsedName == "Luc van Remmerden":
                             if antiSimpModus:
@@ -388,51 +431,56 @@ def commandParser(message):
                         "you are the " + random.choice(["duits les", "gay person", "burning sun", "flickering light", "sunshine", "weird itch"]) + " in my life, thanks!",
                         "When you " + random.choice(["hated on a teacher", "ignored the corona rules", "gave me the VLC virus", "killed someone", "commited suicide"]) + " you made me feel sooo " + random.choice(["horny", "gay", "happy", "slightly touched (;"]),
                         "YOu are so " + random.choice(["gay", "proud", "cool", "brave", "nice", "like my mother", "zenno-like"]) + " and " + random.choice(["uwu-ish", "like my favorite teacher", "like hitler, in a good way", "straight", "radical left", "radical right"])]))
-                        if parsedName in data["achievements"].keys():
-                            data["achievements"][parsedName]["praiseSend"] += 1
-                            if data["achievements"][parsedName]["praiseSend"] == 10:
+                        if parsedName in data["personalData"].keys():
+                            data["personalData"][parsedName]["praiseSend"] += 1
+                            if data["personalData"][parsedName]["praiseSend"] == 10:
                                 responseFunction("{} has unlocked the achievement: praiser 1".format(parsedName))
-                            elif data["achievements"][parsedName]["praiseSend"] == 20:
+                            elif data["personalData"][parsedName]["praiseSend"] == 20:
                                 responseFunction("{} has unlocked the achievement: praiser 2".format(parsedName))
-                            elif data["achievements"][parsedName]["praiseSend"] == 50:
+                            elif data["personalData"][parsedName]["praiseSend"] == 50:
                                 responseFunction("{} has unlocked the achievement: praiser 3".format(parsedName))
-                            elif data["achievements"][parsedName]["praiseSend"] == 100:
+                            elif data["personalData"][parsedName]["praiseSend"] == 100:
                                 responseFunction("{} has unlocked the achievement: praiser 4".format(parsedName))
-                        if parsedMessage.replace("!praise:@", "") in data["achievements"].keys() and parsedName != parsedMessage.replace("!praise:@", ""):
-                            data["achievements"][parsedMessage.replace("!praise:@", "")]["praiseReceived"] += 1 
-                            if data["achievements"][parsedMessage.replace("!praise:@", "")]["praiseReceived"] == 10:
+                        if parsedMessage.replace("!praise:@", "") in data["personalData"].keys() and parsedName != parsedMessage.replace("!praise:@", ""):
+                            data["personalData"][parsedMessage.replace("!praise:@", "")]["praiseReceived"] += 1 
+                            if data["personalData"][parsedMessage.replace("!praise:@", "")]["praiseReceived"] == 10:
                                 responseFunction("{} has unlocked the achievement: praised 1".format(parsedMessage.replace("!praise:", "")))
-                            elif data["achievements"][parsedMessage.replace("!praise:@", "")]["praiseReceived"] == 20:
+                            elif data["personalData"][parsedMessage.replace("!praise:@", "")]["praiseReceived"] == 20:
                                 responseFunction("{} has unlocked the achievement: praised 2".format(parsedMessage.replace("!praise:", "")))
-                            elif data["achievements"][parsedMessage.replace("!praise:@", "")]["praiseReceived"] == 50:
+                            elif data["personalData"][parsedMessage.replace("!praise:@", "")]["praiseReceived"] == 50:
                                 responseFunction("{} has unlocked the achievement: praised 3".format(parsedMessage.replace("!praise:", "")))
-                            elif data["achievements"][parsedMessage.replace("!praise:@", "")]["praiseReceived"] == 100:
+                            elif data["personalData"][parsedMessage.replace("!praise:@", "")]["praiseReceived"] == 100:
                                 responseFunction("{} has unlocked the achievement: praised 4".format(parsedMessage.replace("!praise:", "")))
                     else:
                         responseFunction("Unknown command")
+                    if parsedName in data["personalData"].keys():
+                        if random.randint(1, int(1000*cloverUpgradeList[data["personalData"][parsedName]["cloverUpgrade"]][1])) == 1:
+                            ranMoney = random.randint(100, 1000)
+                            data["personalData"][parsedName]["money"] += ranMoney
+                            responseFunction(parsedName + " has found " + str(ranMoney) + " on the street!")
                 elif parsedMessage.lower() == "ping":
                     responseFunction("pong")
                 elif parsedMessage.lower() == "ik ben gay":
-                    if parsedName in data["achievements"].keys():
-                        data["achievements"][parsedName]["gayUsage"] += 1
-                        if data["achievements"][parsedName]["gayUsage"] == 10:
+                    if parsedName in data["personalData"].keys():
+                        data["personalData"][parsedName]["gayUsage"] += 1
+                        if data["personalData"][parsedName]["gayUsage"] == 10:
                             responseFunction("{} has unlocked the achievement: nothing special to see here 1".format(parsedName))
-                        elif data["achievements"][parsedName]["gayUsage"] == 20:
+                        elif data["personalData"][parsedName]["gayUsage"] == 20:
                             responseFunction("{} has unlocked the achievement: nothing special to see here 2".format(parsedName))
-                        elif data["achievements"][parsedName]["gayUsage"] == 50:
+                        elif data["personalData"][parsedName]["gayUsage"] == 50:
                             responseFunction("{} has unlocked the achievement: nothing special to see here 3".format(parsedName))
-                        elif data["achievements"][parsedName]["gayUsage"] == 100:
+                        elif data["personalData"][parsedName]["gayUsage"] == 100:
                             responseFunction("{} has unlocked the achievement: nothing special to see here 4".format(parsedName))
                 elif parsedMessage.lower() == "(:)":
-                    if parsedName in data["achievements"].keys():
-                        data["achievements"][parsedName]["thomasEmoji"] += 1
-                        if data["achievements"][parsedName]["thomasEmoji"] == 10:
+                    if parsedName in data["personalData"].keys():
+                        data["personalData"][parsedName]["thomasEmoji"] += 1
+                        if data["personalData"][parsedName]["thomasEmoji"] == 10:
                             responseFunction("{} has unlocked the achievement: Thomas emoji 1".format(parsedName))
-                        elif data["achievements"][parsedName]["thomasEmoji"] == 20:
+                        elif data["personalData"][parsedName]["thomasEmoji"] == 20:
                             responseFunction("{} has unlocked the achievement: Thomas emoji 2".format(parsedName))
-                        elif data["achievements"][parsedName]["thomasEmoji"] == 50:
+                        elif data["personalData"][parsedName]["thomasEmoji"] == 50:
                             responseFunction("{} has unlocked the achievement: Thomas emoji 3".format(parsedName))
-                        elif data["achievements"][parsedName]["thomasEmoji"] == 100:
+                        elif data["personalData"][parsedName]["thomasEmoji"] == 100:
                             responseFunction("{} has unlocked the achievement: Thomas emoji 4".format(parsedName))
                 elif parsedMessage.lower().startswith("ik ben ") or parsedMessage.lower().startswith("i am "):
                     if random.randint(1, 10) == 10:
@@ -464,7 +512,7 @@ def commandParser(message):
                     commandsIssued -= 1
             except Exception as error:
                 print("Error: ", error)
-                #responseFunction("Error: Hallo ik ben een irritante bot aan het zijn, en doe glitchy glitchy boehoe.")
+                responseFunction("Error: Hallo ik ben een irritante bot aan het zijn, en doe glitchy glitchy boehoe.")
     except UnboundLocalError:
         pass
 
@@ -536,8 +584,8 @@ class Poll():
         self.options = options
         self.votes = votes
 
-dataPath = "Desktop/data.json"
-groupName = "Niet veranderen ):<"
+dataPath = "data.json"
+groupName = "WhatsappBotBeta"
 with open(dataPath, "r") as file:
     data = json.load(file)
 
@@ -559,6 +607,8 @@ lastRenameTime = time.time() - 3600
 antiSimpModus = data["savedVars"]["antiSimpModus"]
 antiSimpPersons = data["savedVars"]["antiSimpPersons"]
 
+cloverUpgradeList = [[100, 0.9, "Dead clover"], [150, 0.8, "Dying clover"], [200, 0.7, "Kinda alive clover"], [300, 0.5, "Alive clover"], [500, 0.25, "Silver clover"], [1000, 0.1, "Golden clover"], [2000, 0.05, "Omega clover"], [5000, 0.025, "Godly clover"]]
+
 notifyList = []
 
 botName = "EpicBot69"
@@ -573,7 +623,7 @@ driver = webdriver.Chrome()
 
 driver.get("https://web.whatsapp.com")
 
-time.sleep(90)
+time.sleep(40)
 
 search = driver.find_elements_by_class_name("ggj6brxn gfz4du6o r7fjleex g0rxnol2 lhj4utae le5p0ye3 l7jjieqr i0jNr".replace(" ","."))
 for item in search:
