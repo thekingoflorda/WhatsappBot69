@@ -703,24 +703,19 @@ def saveFile():
         json.dump(data, file)
     
     responseFunction("Saved data")
+   
+def autoSave():
+    saveFile()
+    threading.Timer(1800, autosave).start()
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from translate import Translator
-import time, datetime, pyautogui, random, jokes, json
-import threading
+import time, datetime, pyautogui, random, jokes, json, threading
+
 global refreshes, counter, lastRenameTime, botName, countGameCounter, countGameRecord, pollList, savedTimeStamps, startingTime, commandsIssued, messagesScanned, messagesSend, countGameName, antiSimpModus, emojiLimit
 savedMessageDataList = []
 messagesSend = []
-
-def autoSave(startup):
-    if startup == True:
-        return
-    else:
-        saveFile()
-        threading.timer(1800, autosave).start()
-
-autoSave(True)
 
 class Poll():
     def __init__(self, name, pollName, question, options, votes):
@@ -740,6 +735,8 @@ startingTime = datetime.datetime.now()
 commandsIssued = data["stats"]["commandsIssued"]
 messagesScanned = data["stats"]["messagesScanned"]
 refreshes = 0
+
+autoSave()
 
 admins = data["savedVars"]["admins"]
 muted = data["savedVars"]["muted"]
