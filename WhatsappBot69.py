@@ -703,11 +703,15 @@ def saveFile():
         json.dump(data, file)
     
     responseFunction("Saved data")
+   
+def autoSave():
+    saveFile()
+    threading.Timer(1800, autosave).start()
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from translate import Translator
-import time, datetime, pyautogui, random, jokes, json
+import time, datetime, pyautogui, random, jokes, json, threading
 
 global refreshes, counter, lastRenameTime, botName, countGameCounter, countGameRecord, pollList, savedTimeStamps, startingTime, commandsIssued, messagesScanned, messagesSend, countGameName, antiSimpModus, emojiLimit
 savedMessageDataList = []
@@ -731,6 +735,8 @@ startingTime = datetime.datetime.now()
 commandsIssued = data["stats"]["commandsIssued"]
 messagesScanned = data["stats"]["messagesScanned"]
 refreshes = 0
+
+autoSave()
 
 admins = data["savedVars"]["admins"]
 muted = data["savedVars"]["muted"]
