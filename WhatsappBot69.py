@@ -708,10 +708,19 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from translate import Translator
 import time, datetime, pyautogui, random, jokes, json
-
+import threading
 global refreshes, counter, lastRenameTime, botName, countGameCounter, countGameRecord, pollList, savedTimeStamps, startingTime, commandsIssued, messagesScanned, messagesSend, countGameName, antiSimpModus, emojiLimit
 savedMessageDataList = []
 messagesSend = []
+
+def autoSave(startup):
+    if startup == True:
+        return
+    else:
+        saveFile()
+        threading.timer(1800, autosave).start()
+
+autoSave(True)
 
 class Poll():
     def __init__(self, name, pollName, question, options, votes):
