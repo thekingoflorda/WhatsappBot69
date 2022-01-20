@@ -718,10 +718,19 @@ def saveFile():
 
     with open(dataPath, "w") as file:
         json.dump(data, file)
+<<<<<<< HEAD
    
 def autoSave():
     saveFile()
     threading.Timer(1800, saveFile).start()
+=======
+    
+    responseFunction("Saved data")
+   
+def autoSave():
+    saveFile()
+    threading.Timer(1800, autosave).start()
+>>>>>>> 580e38996b86e4cb82a656d2335d8d4abd41a36d
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -750,6 +759,8 @@ startingTime = datetime.datetime.now()
 commandsIssued = data["stats"]["commandsIssued"]
 messagesScanned = data["stats"]["messagesScanned"]
 refreshes = 0
+
+autoSave()
 
 admins = data["savedVars"]["admins"]
 muted = data["savedVars"]["muted"]
