@@ -90,9 +90,11 @@ def commandParser(message):
                     responseFunction(item[2] + " wanted to notify " + item[0] + " of: " + item[1])
                     del notifyList[notifyList.index(item)]
             try:
+                if random.randint(1, 100) == 1:
+                    data["savedVars"]["bankMoney"] += 25
+                    dividendGiver("bank", 25)
+                    data["savedVars"]["expectedMarketCap"] += 25
                 if parsedName in antiSimpPersons and antiSimpModus:
-                    if random.randint(1, 100) == 1:
-                        data["savedVars"]["bankMoney"] += 25
                     if random.randint(0, 10) == 10:
                         responseFunction(random.choice(["Moet jij niet in de keuken staan ofzo?", "Oh god, een meisje...", "Ja ik ben sexistisch, dus?", "Het leven is hard, vooral als er een meisje in de whatsapp groep zit...", "Anti-simp modus is actief, dus praat ik opeens nederlands.", "Ik vindt dat de nieuwe James Bond een vrouw moet zijn, stel je voor hoe goed de explosies en de auto-crashes zullen zijn. En dat terwijl ze aan het parkeren is.", "Sexisme in de banenmarkt bestaat niet. Vrouwen kiezen simpelweg slechtbetalende banen, mannen worden dokter, rechter of professor. Vrouwen worden vrouwlijke dokter, vrouwlijke rechter of vrouwlijke proffesor.", ""]))
                 if parsedMessage.startswith("!"):
@@ -164,6 +166,13 @@ def commandParser(message):
                                 responseFunction("User is already an admin")
                         else:
                             responseFunction("You are not an my creator")
+                    elif parsedMessage.lower() == "!cloverupgradelist":
+                        responseFunction(str(cloverUpgradeList))
+                    elif parsedMessage.lower() == "!marketcap":
+                        marketCap = 0
+                        for player in data["personalData"].keys():
+                            marketCap += data["personalData"][player]["money"]
+                        responseFunction("The market cap is: " + str(marketCap) + " and the expected market cap is: " + str(data["savedVars"]["expectedMarketCap"]))
                     elif parsedMessage.lower().startswith("!quote"):
                         responseFunction("\"" + parsedMessage.split(":")[1] + "\" - " + parsedMessage.split(":")[0].replace("!quote", "").replace("!Quote", "") + " (" + str(datetime.datetime.now()) + ")")
                     elif parsedMessage.lower().startswith("!createpoll:"):
@@ -245,10 +254,11 @@ def commandParser(message):
                         else:
                             responseFunction("STFU, your muted...")
                     elif parsedMessage.lower() == "!reseteconomy":
+                        data["savedVars"]["expectedMarketCap"] = 100
+                        data["savedVars"]["bankMoney"] = 100
                         if parsedName == "Luc van Remmerden":
                             for user in data["personalData"]:
                                 data["personalData"][user]["money"] = 100
-                                data["savedVars"]["bankMoney"] = 100
                                 data["personalData"][user]["claimTime"] = time.time() - 900000000
                                 data["personalData"][user]["dividendTime"] = time.time() - 900000000
                                 data["personalData"][user]["dividend"] = 0
@@ -291,9 +301,9 @@ def commandParser(message):
                             if "money" not in data["personalData"][player].keys():
                                 data["personalData"][player]["money"] = 100
                                 data["personalData"][player]["cloverUpgrade"] = 0
-                            moneyListString += (player + ": " + str(data["personalData"][player]["money"]) + " || ")
+                            moneyListString += (player + ": " + str(round(data["personalData"][player]["money"], 2)) + " || ")
                         if "bankMoney" in data["savedVars"].keys():
-                            moneyListString += ("Bank: " + str(data["savedVars"]["bankMoney"]))
+                            moneyListString += ("Bank: " + str(round(data["savedVars"]["bankMoney"], 2)))
                         else:
                             data["savedVars"]["bankMoney"] = 0
                         responseFunction(moneyListString)
@@ -305,18 +315,18 @@ def commandParser(message):
                             if data["personalData"][parsedName]["money"] > int(parsedMessage.split(":")[2]):
                                 data["personalData"][parsedName]["money"] -= int(parsedMessage.split(":")[2])
                                 data["savedVars"]["bankMoney"] += int(parsedMessage.split(":")[2])
-                                dividendGiver("bank", int(parsedMessage.split(":")[2]))
                                 data["personalData"][parsedName]["investments"].append([data["savedVars"]["bankMoney"], int(parsedMessage.split(":")[2]), "bank"])
                                 responseFunction("You invested " + parsedMessage.split(":")[2] + " in the bank")
                             else:
                                 responseFunction("{} does not have enough money to invest that much or you are trying to invest less than 1 money.".format(parsedName))
-                        elif parsedMessage.split(":")[1].replace("@", "") in data["personalData"].keys():
+                        elif parsedMessage.split(":")[1].replace("@", "") in data["personalData"].keys() and parsedMessage.split(":")[1].replace("@", "") != parsedName:
                             if int(parsedMessage.split(":")[2]) < data["personalData"][parsedName]["money"] and int(parsedMessage.split(":")[2]) > 0:
                                 data["personalData"][parsedName]["money"] -= int(parsedMessage.split(":")[2])
                                 data["personalData"][parsedMessage.split(":")[1].replace("@", "")]["money"] += int(parsedMessage.split(":")[2])
-                                dividendGiver(parsedMessage.split(":")[1].replace("@", ""), int(parsedMessage.split(":")[2]))
                                 data["personalData"][parsedName]["investments"].append([data["personalData"][parsedMessage.split(":")[1].replace("@", "")]["money"], int(parsedMessage.split(":")[2]), parsedMessage.split(":")[1].replace("@", "")])
                                 responseFunction("{} invested {} in {}".format(parsedName, parsedMessage.split(":")[2], parsedMessage.split(":")[1].replace("@", "")))
+                            elif parsedMessage.split(";")[1].replace("@", "") == parsedName:
+                                responseFunction("You can't invest money in yourself.")
                             else:
                                 responseFunction("{} does not have enough money to invest that much or you are trying to invest less than 1 money.".format(parsedName))
                         else:
@@ -325,9 +335,9 @@ def commandParser(message):
                         investmentListString = parsedName + "\'s investments: "
                         for enu, investment in enumerate(data["personalData"][parsedName]["investments"]):
                             if investment[2].lower() == "bank":
-                                investmentListString += str(enu) + ": " + str(investment[1] * (data["savedVars"]["bankMoney"] / investment[0])) + " in " + investment[2] + " || "
+                                investmentListString += str(enu) + ": " + str(round(investment[1] * (data["savedVars"]["bankMoney"] / investment[0]), 2)) + " ({})".format(str(investment[1])) + " in " + investment[2] + " || "
                             else:
-                                investmentListString += str(enu) + ": " + str(investment[1] * (data["personalData"][investment[2]]["money"] / investment[0])) + " in " + investment[2] + " || "
+                                investmentListString += str(enu) + ": " + str(round(investment[1] * (data["personalData"][investment[2]]["money"] / investment[0]), 2)) + " ({})".format(str(investment[1])) + " in " + investment[2] + " || "
                         responseFunction(investmentListString)
                     elif parsedMessage.lower().startswith("!sell:"):
                         if len(data["personalData"][parsedName]["investments"]) > int(parsedMessage.split(":")[1]):
@@ -360,7 +370,7 @@ def commandParser(message):
                     elif parsedMessage.lower() == "!claim":
                         if "claimTime" in data["personalData"][parsedName].keys():
                             if data["personalData"][parsedName]["claimTime"] + 86400 < time.time():
-                                randomClaimAmount = random.randint(1, 100 / (data["personalData"][parsedName]["cloverUpgrade"] + 1))
+                                randomClaimAmount = random.randint(1, int(100 / (data["personalData"][parsedName]["cloverUpgrade"] + 1)))
                                 if data["savedVars"]["bankMoney"] - randomClaimAmount > 0:
                                     data["personalData"][parsedName]["money"] += randomClaimAmount
                                     data["savedVars"]["bankMoney"] -= randomClaimAmount
@@ -471,6 +481,7 @@ def commandParser(message):
                             responseFunction("Removed pickupline")
                     elif parsedMessage.lower() == "!save":
                         saveFile()
+                        responseFunction("Saved data")
                     elif parsedMessage.lower() == "!achievements":
                         if parsedName in data["personalData"].keys():
                             responseFunction("MessageSend(100, 200, 500, 1000, 2000, 5000, 10000): {} || Thomas emoji(10, 20, 50, 100): {} || \"ik ben gay\"(10, 20, 50, 100): {} || praiser(10, 20, 50, 100): {} || praised(10, 20, 50, 100): {} || spammer(10, 20, 50, 100): {} || joker(10, 20, 50, 100): {}".format(data["personalData"][parsedName]["messagesSend"], data["personalData"][parsedName]["thomasEmoji"], data["personalData"][parsedName]["gayUsage"], data["personalData"][parsedName]["praiseSend"], data["personalData"][parsedName]["praiseReceived"], data["personalData"][parsedName]["spamCommandUsed"], data["personalData"][parsedName]["jokes"]))
@@ -562,11 +573,17 @@ def commandParser(message):
                         responseFunction("Unknown command")
                     if parsedName in data["personalData"].keys():
                         if random.randint(1, int(1000*cloverUpgradeList[data["personalData"][parsedName]["cloverUpgrade"]][1])) == 1:
-                            ranMoney = random.randint(100, 1000)
-                            data["personalData"][parsedName]["money"] += ranMoney
-                            data["savedVars"]["bankMoney"] -= ranMoney
-                            dividendGiver(parsedName, ranMoney)
-                            responseFunction(parsedName + " has found " + str(ranMoney) + " on the street!")
+                            ranMoney = random.randint(100, 300)
+                            if ranMoney < data["savedVars"]["bankMoney"]:
+                                data["personalData"][parsedName]["money"] += ranMoney
+                                data["savedVars"]["bankMoney"] -= ranMoney
+                                dividendGiver(parsedName, ranMoney)
+                                responseFunction(parsedName + " has found " + str(ranMoney) + " on the street!")
+                            else:
+                                data["personalData"][parsedName]["money"] += data["savedVars"]["bankMoney"] - 1
+                                data["savedVars"]["bankMoney"] == 1
+                                dividendGiver(parsedName, ranMoney)
+                                responseFunction(parsedName + " has found " + str(data["savedVars"]["bankMoney"] - 1) + " on the street!")
                 elif parsedMessage.lower() == "ping":
                     responseFunction("pong")
                 elif parsedMessage.lower() == "ik ben gay":
@@ -701,13 +718,15 @@ def saveFile():
 
     with open(dataPath, "w") as file:
         json.dump(data, file)
-    
-    responseFunction("Saved data")
+   
+def autoSave():
+    saveFile()
+    threading.Timer(1800, saveFile).start()
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from translate import Translator
-import time, datetime, pyautogui, random, jokes, json
+import time, datetime, pyautogui, random, jokes, json, threading
 
 global refreshes, counter, lastRenameTime, botName, countGameCounter, countGameRecord, pollList, savedTimeStamps, startingTime, commandsIssued, messagesScanned, messagesSend, countGameName, antiSimpModus, emojiLimit
 savedMessageDataList = []
@@ -756,11 +775,16 @@ countGameCounter = 0
 countGameRecord = data["savedVars"]["countGameRecord"]
 countGameName = ""
 
+if "expectedMarketCap" not in data["savedVars"].keys():
+    data["savedVars"]["expectedMarketCap"] = 0
+
 driver = webdriver.Chrome()
 
 driver.get("https://web.whatsapp.com")
 
 time.sleep(90)
+
+autoSave()
 
 search = driver.find_elements_by_class_name("ggj6brxn gfz4du6o r7fjleex g0rxnol2 lhj4utae le5p0ye3 l7jjieqr i0jNr".replace(" ","."))
 for item in search:
@@ -771,7 +795,7 @@ for item in search:
         while True:
             print("----->loop:{}<-----".format(counter))
             counter += 1
-            if counter > 20000:
+            if counter > 15000:
                 refreshWhatsapp()
             
             if check_messages():
